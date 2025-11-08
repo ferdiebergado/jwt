@@ -21,9 +21,9 @@ func TestCreateAndVerifySuccess(t *testing.T) {
 		Sub: "user-123",
 	}
 
-	token, err := jwt.CreateJWT(claims, []byte(key), time.Minute)
+	token, err := jwt.Create(claims, []byte(key), time.Minute)
 	if err != nil {
-		t.Fatalf("CreateJWT() = %v", err)
+		t.Fatalf("Create() = %v", err)
 	}
 
 	validators := []jwt.ClaimValidator{
@@ -144,12 +144,12 @@ func TestCreateAndVerifyJWTFails(t *testing.T) {
 				tt.setup(claims)
 			}
 
-			token, err := jwt.CreateJWT(claims, tt.secret, time.Minute)
+			token, err := jwt.Create(claims, tt.secret, time.Minute)
 			if err != nil {
 				if tt.wantErr != nil {
 					return
 				}
-				t.Fatalf("CreateJWT() = %v", err)
+				t.Fatalf("Create() = %v", err)
 			}
 
 			if tt.modify != nil {

@@ -5,8 +5,8 @@
 // breadth. Only symmetric key signing (HMAC) is supported to minimize attack
 // surface and external dependencies.
 //
-// Typical usage involves creating a token with CreateJWT() and verifying it
-// with VerifyJWT(). The CreateJWT function automatically sets standard claims
+// Typical usage involves creating a token with Create() and verifying it
+// with VerifyJWT(). The Create function automatically sets standard claims
 // such as "iat" (issued at) and "exp" (expiration time) if not already provided.
 //
 // The VerifyJWT function validates the signature, decodes claims, and enforces
@@ -22,7 +22,7 @@
 //		Aud: "my-client",
 //	}
 //
-//	token, err := jwt.CreateJWT(claims, []byte("mysecret"))
+//	token, err := jwt.Create(claims, []byte("mysecret"))
 //	if err != nil {
 //		log.Fatal(err)
 //	}
@@ -78,12 +78,12 @@ type JWTClaims struct {
 }
 
 // -----------------------------------------------------------------------------
-// CreateJWT
+// Create
 // -----------------------------------------------------------------------------
 
-// CreateJWT generates an RFC-compliant HS256 JWT string with optional defaults.
+// Create generates an RFC-compliant HS256 JWT string with optional defaults.
 // It sets iat automatically and exp if zero (using expTTL as validity period).
-func CreateJWT(claims *JWTClaims, secretKey []byte, expTTL time.Duration) (string, error) {
+func Create(claims *JWTClaims, secretKey []byte, expTTL time.Duration) (string, error) {
 	if len(secretKey) < 32 {
 		return "", errors.New("secret key should at least be 32 bytes)")
 	}

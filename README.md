@@ -41,7 +41,7 @@ claims := &jwt.JWTClaims{
     Exp: time.Now().Add(1 * time.Hour).Unix(),
 }
 
-token, err := jwt.CreateJWT(claims, []byte(secretKey))
+token, err := jwt.Create(claims, []byte(secretKey))
 if err != nil {
     log.Fatal(err)
 }
