@@ -3,7 +3,7 @@
 [![CodeQL](https://github.com/ferdiebergado/jwt/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/ferdiebergado/jwt/actions/workflows/github-code-scanning/codeql) [![Go Report Card](https://goreportcard.com/badge/github.com/ferdiebergado/jwt)](https://goreportcard.com/report/github.com/ferdiebergado/jwt)
 
 A minimal, **secure**, and **RFC 7519–compliant** JSON Web Token implementation for Go.
-Supports **HS256 (HMAC-SHA256)** only — no “alg=none” or asymmetric algorithms.
+Supports **HS256 (HMAC-SHA256)** only — no `alg=none` or asymmetric algorithms.
 
 Designed for correctness, simplicity, and long-term maintainability.
 No dependencies outside the Go standard library.
@@ -32,6 +32,8 @@ go get github.com/ferdiebergado/jwt
 ### Creating a JWT
 
 ```go
+const secretKey = "supersecretlongkeythatshouldbe32bytesmin"
+
 claims := &jwt.JWTClaims{
     Iss: "my-app",
     Sub: "user123",
@@ -39,7 +41,7 @@ claims := &jwt.JWTClaims{
     Exp: time.Now().Add(1 * time.Hour).Unix(),
 }
 
-token, err := jwt.CreateJWT(claims, []byte("supersecretkey"))
+token, err := jwt.CreateJWT(claims, []byte(secretKey))
 if err != nil {
     log.Fatal(err)
 }
@@ -58,7 +60,7 @@ validators := []jwt.ClaimValidator{
 }
 
 var parsed jwt.JWTClaims
-err = jwt.Verify(token, []byte(key), &parsed, leeway, validators...)
+err = jwt.Verify(token, []byte(secretKey), &parsed, leeway, validators...)
 if err != nil {
     log.Fatal(err)
 }
@@ -74,7 +76,7 @@ go test ./...
 
 ## ⚙️ Design Philosophy
 
--   Explicit security: avoids dangerous flexibility like multiple algorithms or “none”.
+-   Explicit security: avoids dangerous flexibility like multiple algorithms or `none`.
 -   Predictable behavior: strict base64 decoding, JSON handling, and claim checks.
 -   Stable core: relies only on Go’s standard library — no external crypto packages.
 
@@ -88,4 +90,4 @@ go test ./...
 -   Always use a sufficiently random secret key (≥ 256 bits recommended).
 -   Keep keys out of source control and rotate them periodically.
 -   Tokens are verified in constant time to prevent timing attacks.
--   Expiration and “not before” checks follow RFC 7519 strictly.
+-   Expiration and "not before" checks follow RFC 7519 strictly.
