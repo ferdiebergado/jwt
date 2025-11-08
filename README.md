@@ -2,11 +2,15 @@
 
 [![Test](https://github.com/ferdiebergado/jwt/actions/workflows/go.yml/badge.svg)](https://github.com/ferdiebergado/jwt/actions/workflows/go.yml) [![CodeQL](https://github.com/ferdiebergado/jwt/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/ferdiebergado/jwt/actions/workflows/github-code-scanning/codeql) [![Go Report Card](https://goreportcard.com/badge/github.com/ferdiebergado/jwt)](https://goreportcard.com/report/github.com/ferdiebergado/jwt) [![Go Reference](https://pkg.go.dev/badge/github.com/ferdiebergado/jwt.svg)](https://pkg.go.dev/github.com/ferdiebergado/jwt)
 
-A minimal, **secure**, and **RFC 7519–compliant** JSON Web Token implementation for Go.
+A minimal, **secure**, and **RFC 7519–compliant** `JSON Web Token` implementation for Go.
 Supports **HS256 (HMAC-SHA256)** only — no `alg=none` or asymmetric algorithms.
 
 Designed for correctness, simplicity, and long-term maintainability.
 No dependencies outside the Go standard library.
+
+**Minimal. Secure. Predictable.**
+
+Everything you need for `HS256 JWTs` — nothing you don’t.
 
 ---
 
@@ -18,6 +22,12 @@ No dependencies outside the Go standard library.
 -   ✅ **RFC 7519–compliant time validation** (`exp`, `nbf`, `iat`)
 -   ✅ **Optional claim validators** (e.g., `aud`, `iss` checks)
 -   ✅ **Pure stdlib**, no third-party dependencies
+
+## ⚙️ Design Philosophy
+
+-   Explicit security: avoids dangerous flexibility like multiple algorithms or `none`.
+-   Predictable behavior: strict base64 decoding, JSON handling, and claim checks.
+-   Stable core: relies only on Go’s standard library — no external `crypto` packages.
 
 ---
 
@@ -52,7 +62,7 @@ fmt.Println("Token:", token)
 ### Verifying a JWT
 
 ```go
-const leeway = 30
+const leeway = 30 // adjust based on your clock skew in seconds
 
 var parsed jwt.JWTClaims
 err = jwt.Verify(token, []byte(secretKey), &parsed, leeway)
@@ -60,7 +70,7 @@ if err != nil {
     log.Fatal(err)
 }
 
-log.Println(parsed.Sub)
+fmt.Println(parsed.Sub)
 ```
 
 ### Validating Claims
@@ -73,10 +83,10 @@ A `validator` is just a function that accepts a `JWTClaims` and returns an error
 type ClaimValidator func(c *JWTClaims) error
 ```
 
-The package has a couple of built-in validators:
+The package has a couple of built-in `validators`:
 
--   `RequireIssuer` for validating the `issuer` claim
--   `RequireAudience` for validating the `audience` claim
+-   **RequireIssuer** for validating the `issuer` claim
+-   **RequireAudience** for validating the `audience` claim
 
 Example:
 
@@ -96,20 +106,10 @@ err = jwt.Verify(token, []byte(secretKey), &parsed, leeway, validators...)
 go test ./...
 ```
 
-## ⚙️ Design Philosophy
-
--   Explicit security: avoids dangerous flexibility like multiple algorithms or `none`.
--   Predictable behavior: strict base64 decoding, JSON handling, and claim checks.
--   Stable core: relies only on Go’s standard library — no external crypto packages.
-
-    **Minimal. Secure. Predictable.**
-
-    Everything you need for `HS256 JWTs` — nothing you don’t.
-
 ## 🔐 Security Notes
 
 -   Only `HS256` is supported (`HMAC-SHA256`).
 -   Always use a sufficiently random secret key (≥ 256 bits recommended).
 -   Keep keys out of source control and rotate them periodically.
 -   Tokens are verified in constant time to prevent timing attacks.
--   Expiration and "not before" checks follow RFC 7519 strictly.
+-   Expiration and "not before" checks follow `RFC 7519` strictly.
