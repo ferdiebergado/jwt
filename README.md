@@ -1,31 +1,6 @@
 # jwt
 
-A minimal, **secure**, and **RFC 7519–compliant** JSON Web Token implementation for Go.
-Supports **HS256 (HMAC-SHA256)** only — no “alg=none” or asymmetric algorithms.
-
-Designed for correctness, simplicity, and long-term maintainability.
-No dependencies outside the Go standard library.
-
----
-
-## ✨ Features
-
--   ✅ **HS256 only** — prevents algorithm-confusion attacks
--   ✅ **Constant-time signature verification**
--   ✅ **Automatic `iat` / `exp` handling**
--   ✅ **RFC 7519–compliant time validation** (`exp`, `nbf`, `iat`)
--   ✅ **Optional claim validators** (e.g., `aud`, `iss` checks)
--   ✅ **Pure stdlib**, no third-party dependencies
-
----
-
-## 📦 Installation
-
-```bash
-go get github.com/ferdiebergado/jwt
-```
-
-# jwt
+[![CodeQL](https://github.com/ferdiebergado/jwt/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/ferdiebergado/jwt/actions/workflows/github-code-scanning/codeql) [![Go Report Card](https://goreportcard.com/badge/github.com/ferdiebergado/jwt)](https://goreportcard.com/report/github.com/ferdiebergado/jwt)
 
 A minimal, **secure**, and **RFC 7519–compliant** JSON Web Token implementation for Go.
 Supports **HS256 (HMAC-SHA256)** only — no “alg=none” or asymmetric algorithms.
