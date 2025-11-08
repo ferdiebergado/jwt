@@ -1,6 +1,6 @@
 # jwt
 
-[![CodeQL](https://github.com/ferdiebergado/jwt/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/ferdiebergado/jwt/actions/workflows/github-code-scanning/codeql) [![Go Report Card](https://goreportcard.com/badge/github.com/ferdiebergado/jwt)](https://goreportcard.com/report/github.com/ferdiebergado/jwt)
+[![Test](https://github.com/ferdiebergado/jwt/actions/workflows/go.yml/badge.svg)](https://github.com/ferdiebergado/jwt/actions/workflows/go.yml) [![CodeQL](https://github.com/ferdiebergado/jwt/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/ferdiebergado/jwt/actions/workflows/github-code-scanning/codeql) [![Go Report Card](https://goreportcard.com/badge/github.com/ferdiebergado/jwt)](https://goreportcard.com/report/github.com/ferdiebergado/jwt) [![Go Reference](https://pkg.go.dev/badge/github.com/ferdiebergado/jwt.svg)](https://pkg.go.dev/github.com/ferdiebergado/jwt)
 
 A minimal, **secure**, and **RFC 7519–compliant** JSON Web Token implementation for Go.
 Supports **HS256 (HMAC-SHA256)** only — no `alg=none` or asymmetric algorithms.
