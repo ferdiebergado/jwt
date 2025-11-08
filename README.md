@@ -54,6 +54,33 @@ fmt.Println("Token:", token)
 ```go
 const leeway = 30
 
+var parsed jwt.JWTClaims
+err = jwt.Verify(token, []byte(secretKey), &parsed, leeway)
+if err != nil {
+    log.Fatal(err)
+}
+
+log.Println(parsed.Sub)
+```
+
+### Validating Claims
+
+`Verify` accepts any number of `validators` and use it to validate the claims.
+
+A `validator` is just a function that accepts a `JWTClaims` and returns an error.
+
+```go
+type ClaimValidator func(c *JWTClaims) error
+```
+
+The package has a couple of built-in validators:
+
+-   `RequireIssuer` for validating the `issuer` claim
+-   `RequireAudience` for validating the `audience` claim
+
+Example:
+
+```go
 validators := []jwt.ClaimValidator{
     jwt.RequireIssuer(claims.Iss),
     jwt.RequireAudience(claims.Aud),
@@ -61,11 +88,6 @@ validators := []jwt.ClaimValidator{
 
 var parsed jwt.JWTClaims
 err = jwt.Verify(token, []byte(secretKey), &parsed, leeway, validators...)
-if err != nil {
-    log.Fatal(err)
-}
-
-log.Println(parsed.Sub)
 ```
 
 ## 🧪 Testing
