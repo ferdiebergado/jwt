@@ -169,6 +169,81 @@ func TestCreateAndVerifyJWTFails(t *testing.T) {
 	}
 }
 
+// --- FUZZ TEST ---
+
+// FuzzVerify uses fuzzing to find crashes or unexpected behavior in the Verify function.
+func FuzzVerify(f *testing.F) {
+	// Define the stable secret key used by all tests
+	const stableSecret = "a_very_long_and_stable_secret_key_for_fuzzing_purposes_12345678"
+
+	// 1. Add known valid tokens and deliberately malformed inputs to the corpus
+	goodClaims := &jwt.JWTClaims{
+		Iss: "fuzz-server",
+		Sub: "fuzz-user",
+		Aud: []string{"fuzz-client"},
+	}
+	validToken, err := jwt.Create(goodClaims, []byte(stableSecret), time.Hour)
+	if err != nil {
+		f.Fatalf("Failed to create seed token: %v", err)
+	}
+
+	// Seed corpus with a valid token (expected success)
+	f.Add(validToken, stableSecret)
+
+	// Seed corpus with malformed tokens (expected failures: ErrMalformed, ErrInvalidSig, etc.)
+	f.Add("abc.def.ghi", stableSecret)                                  // Malformed Base64 parts
+	f.Add("..", stableSecret)                                           // Not enough parts
+	f.Add(strings.Repeat("a", 1000), stableSecret)                      // Very long string
+	f.Add(validToken+"extra", stableSecret)                             // Token with extra segment
+	f.Add(validToken, "incorrect_secret")                               // Valid token, wrong secret (should fail sig check)
+	f.Add("eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0.e30.c2ln", stableSecret) // alg=none attempt
+
+	f.Fuzz(func(t *testing.T, token string, secret string) {
+		// Prepare inputs for the Verify function
+		var claims jwt.JWTClaims
+		secretKey := []byte(secret)
+		leeway := int64(30) // Use a fixed leeway for the fuzzing run
+
+		// Avoid panics on zero-length secret keys, which is already handled by the CreateJWT mock
+		if len(secretKey) < 1 {
+			return
+		}
+
+		// The goal of fuzzing is *not* to make Verify succeed, but to ensure it
+		// does not crash (panic) and returns a controlled, expected error.
+		err := jwt.Verify(token, secretKey, &claims, leeway)
+
+		// Check for specific, expected, controlled errors
+		if err != nil {
+			// Ensure all errors are recognized errors from the package.
+			// Fuzzing should not cause unexpected runtime errors (panics).
+			switch {
+			case errors.Is(err, jwt.ErrMalformed):
+			case errors.Is(err, jwt.ErrAlgUnsupported):
+			case errors.Is(err, jwt.ErrInvalidSig):
+			case strings.Contains(err.Error(), "decode header"): // Base64 decode errors
+			case strings.Contains(err.Error(), "unmarshal header"): // JSON unmarshal errors
+			case strings.Contains(err.Error(), "decode claims"): // Base64 decode errors
+			case strings.Contains(err.Error(), "unmarshal claims"): // JSON unmarshal errors
+			case errors.Is(err, jwt.ErrExpired):
+			case errors.Is(err, jwt.ErrNotYetValid):
+			default:
+				// If an error is returned that we haven't categorized, it's worth logging,
+				// but the primary fuzz goal is preventing crashes.
+				t.Logf("Unexpected error type: %v", err)
+			}
+			return
+		}
+
+		// If verification succeeds, we must ensure the claims are reasonable.
+		// This verifies that unexpected input did not lead to a successful bypass.
+		if claims.Iss == "" {
+			t.Errorf("Verify unexpectedly succeeded with empty issuer for token: %s", token)
+		}
+		// Add more logical checks here if a token unexpectedly verifies successfully
+	})
+}
+
 func base64URLEncode(b []byte) string {
 	return strings.TrimRight(strings.NewReplacer("+", "-", "/", "_").Replace(base64Encode(b)), "=")
 }
